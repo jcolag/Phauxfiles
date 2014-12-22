@@ -11,33 +11,34 @@ pub struct FauxPerson {
 }
 
 fn main() {
-    let mut sock_names = std::io::TcpStream::connect("api.uinames.com:80").unwrap();
-    let http_req_status = sock_names.write(b"GET http://api.uinames.com/?amount=6 HTTP/1.0\n\n");
+    let names = http_get("api.uinames.com:80", b"GET http://api.uinames.com/?amount=6 HTTP/1.0\n\n");
+    let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
+    for who in people.iter() {
+        println!("{} {}\n{} from {}\n", who.name, who.surname, who.gender, who.country);
+    }
+}
+
+fn http_get(server: &str, request: &[u8]) -> String {
+    let mut socket = std::io::TcpStream::connect(server).unwrap();
+    let http_req_status = socket.write(request);
 
     match http_req_status {
-        Ok(x) => println!(""),
-        Err(x) => panic!(x),
+        Ok(t) => t,
+        Err(e) => panic!(e),
     }
 
-    let resp_names_result = sock_names.read_to_end();
-
-    let resp_names = match resp_names_result {
+    let response = match socket.read_to_end() {
         Ok(t) => t,
         Err(e) => panic!(e),
     };
 
-    let names_structure = match str::from_utf8(resp_names.as_slice()) {
-        Some(e) => e,
+    let structure = match str::from_utf8(response.as_slice()) {
+        Some(t) => t,
         None => panic!("Invalid UTF-8 sequence"),
     };
 
-    let http_pieces = names_structure.split_str("\n");
+    let http_pieces = structure.split_str("\n");
     let parts: Vec<&str> = http_pieces.collect();
-    let names_body = parts[parts.len() - 1];
-
-    let people: Vec<FauxPerson> = json::decode(names_body.as_slice()).unwrap();
-    for who in people.iter() {
-        println!("{} {}\n{} from {}\n", who.name, who.surname, who.gender, who.country);
-    }
+    parts[parts.len() - 1].to_string()
 }
 
