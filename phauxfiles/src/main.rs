@@ -10,11 +10,27 @@ pub struct FauxPerson {
     country: String,
 }
 
+#[deriving(Decodable, Encodable)]
+pub struct ImageUrl {
+    epic: String,
+    bigger: String,
+    normal: String,
+    mini: String,
+}
+
+#[deriving(Decodable, Encodable)]
+pub struct FaceCollection {
+    username: String,
+    image_urls: ImageUrl,
+}
+
 fn main() {
     let names = http_get("api.uinames.com:80", b"GET http://api.uinames.com/?amount=6 HTTP/1.0\n\n");
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
     for who in people.iter() {
-        println!("{} {}\n{} from {}\n", who.name, who.surname, who.gender, who.country);
+        let faces = http_get("uifaces.com:80", b"GET /api/v1/random HTTP/1.0\nHost: uifaces.com\n\n");
+        let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
+        println!("{} {}\n{} from {}\n{}\n", who.name, who.surname, who.gender, who.country, urls.image_urls.bigger);
     }
 }
 
