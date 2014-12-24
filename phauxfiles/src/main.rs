@@ -1,5 +1,6 @@
 extern crate serialize;
 use serialize::json;
+use std::fmt;
 use std::str;
 
 #[deriving(Decodable, Encodable)]
@@ -8,6 +9,12 @@ pub struct FauxPerson {
     surname: String,
     gender: String,
     country: String,
+}
+
+impl fmt::Show for FauxPerson {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {}\n{} from {}", self.name, self.surname, self.gender, self.country)
+    }
 }
 
 #[deriving(Decodable, Encodable)]
@@ -24,13 +31,19 @@ pub struct FaceCollection {
     image_urls: ImageUrl,
 }
 
+impl fmt::Show for FaceCollection {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.image_urls.epic)
+    }
+}
+
 fn main() {
     let names = http_get("api.uinames.com:80", b"GET http://api.uinames.com/?amount=6 HTTP/1.0\n\n");
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
     for who in people.iter() {
         let faces = http_get("uifaces.com:80", b"GET /api/v1/random HTTP/1.0\nHost: uifaces.com\n\n");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
-        println!("{} {}\n{} from {}\n{}\n", who.name, who.surname, who.gender, who.country, urls.image_urls.bigger);
+        println!("{}\n{}\n", who.to_string(), urls.to_string());
     }
 }
 
