@@ -13,7 +13,12 @@ pub struct FauxPerson {
 
 impl fmt::Show for FauxPerson {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {}\n{} from {}", self.name, self.surname, self.gender, self.country)
+        let (ref name, ref surname) = match self.country.as_slice() {
+            // Surnames still come first for Chinese names, presumably
+            "China" => (self.surname.clone(), self.name.clone()),
+            _ => (self.name.clone(), self.surname.clone()),
+        };
+        write!(f, "{} {}\n{} from {}", name, surname, self.gender, self.country)
     }
 }
 
