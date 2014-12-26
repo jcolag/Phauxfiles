@@ -1,60 +1,25 @@
 extern crate serialize;
 use serialize::json;
-use std::fmt;
 use std::str;
+use fauxperson::{FauxPerson,FaceCollection};
 
-#[deriving(Decodable, Encodable)]
-pub struct FauxPerson {
-    name: String,
-    surname: String,
-    gender: String,
-    country: String,
-}
-
-impl fmt::Show for FauxPerson {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let (ref name, ref surname) = match self.country.as_slice() {
-            // Surnames still come first for Chinese names, presumably
-            "China" => (self.surname.clone(), self.name.clone()),
-            _ => (self.name.clone(), self.surname.clone()),
-        };
-        write!(f, "{} {}\n{} from {}", name, surname, self.gender, self.country)
-    }
-}
-
-#[deriving(Decodable, Encodable)]
-pub struct ImageUrl {
-    epic: String,
-    bigger: String,
-    normal: String,
-    mini: String,
-}
-
-#[deriving(Decodable, Encodable)]
-pub struct FaceCollection {
-    username: String,
-    image_urls: ImageUrl,
-}
-
-impl fmt::Show for FaceCollection {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.image_urls.epic)
-    }
-}
+mod fauxperson;
 
 fn main() {
-    let names = http_get("api.uinames.com:80", b"GET http://api.uinames.com/?amount=6 HTTP/1.0\n\n");
+    let names = http_get("api.uinames.com", 80, "/?amount=6");
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
     for who in people.iter() {
-        let faces = http_get("uifaces.com:80", b"GET /api/v1/random HTTP/1.0\nHost: uifaces.com\n\n");
+        let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
         println!("{}\n{}\n", who.to_string(), urls.to_string());
     }
 }
 
-fn http_get(server: &str, request: &[u8]) -> String {
-    let mut socket = std::io::TcpStream::connect(server).unwrap();
-    let http_req_status = socket.write(request);
+fn http_get(host: &str, port: i32, path: &str) -> String {
+    let server = format!("{}:{}", host, port.to_string());
+    let request = format!("GET {} HTTP/1.0\nHost: {}\n\n", path.to_string(), host);
+    let mut socket = std::io::TcpStream::connect(server.as_slice()).unwrap();
+    let http_req_status = socket.write(request.as_bytes());
 
     match http_req_status {
         Ok(t) => t,
