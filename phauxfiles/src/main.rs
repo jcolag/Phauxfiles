@@ -8,11 +8,16 @@ mod fauxperson;
 fn main() {
     let names = http_get("api.uinames.com", 80, "/?amount=6");
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
+    println!("<html><head><title>Fake Search Results</title>");
+    println!("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+    println!("<link rel='stylesheet' href='format.css'");
+    println!("</head><body>");
     for who in people.iter() {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
-        println!("{}\n{}\n", who.to_string(), urls.to_string());
+        println!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
     }
+    println!("</body></html>")
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {

@@ -15,7 +15,7 @@ impl fmt::Show for FauxPerson {
             "China" => (self.surname.clone(), self.name.clone()),
             _ => (self.name.clone(), self.surname.clone()),
         };
-        write!(f, "{} {}\n{} from {}", name, surname, self.gender, self.country)
+        write!(f, "<h2>{} {}</h2>\n{} from <strong>{}</strong>", name, surname, self.gender, self.country)
     }
 }
 
@@ -35,7 +35,7 @@ pub struct FaceCollection {
 
 impl fmt::Show for FaceCollection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.image_urls.epic)
+        write!(f, "<img src='{}'>", self.image_urls.epic)
     }
 }
 
