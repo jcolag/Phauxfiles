@@ -37,8 +37,8 @@ fn http_get(host: &str, port: i32, path: &str) -> String {
     };
 
     let structure = match str::from_utf8(response.as_slice()) {
-        Some(t) => t,
-        None => panic!("Invalid UTF-8 sequence"),
+        Ok(t) => t,
+        Err(e) => panic!("Invalid UTF-8 sequence, {}", e),
     };
 
     let http_pieces = structure.split_str("\n");
