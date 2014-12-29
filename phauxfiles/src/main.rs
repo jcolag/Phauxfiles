@@ -1,12 +1,19 @@
 extern crate serialize;
 use serialize::json;
+use std::os;
 use std::str;
 use fauxperson::{FauxPerson,FaceCollection};
 
 mod fauxperson;
 
 fn main() {
-    let names = http_get("api.uinames.com", 80, "/?amount=6");
+    let args = os::args();
+    let mut count = "6";
+    if args.len() > 1 {
+        count = args[1].as_slice();
+    }
+    let path = format!("/?amount={}", count);
+    let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
     println!("<html><head><title>Fake Search Results</title>");
     println!("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
