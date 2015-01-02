@@ -1,0 +1,32 @@
+body {
+  font-family: Calibri, "Trebuchet MS", Helvetica, Arial, sans-serif, 'lucida console';
+  height: 100%;
+  line-height: 1.5em;
+  margin-top: 10%;
+  margin-bottom: 10%;
+  margin-left: 20%;
+  margin-right: 20%;
+  text-align: justify;
+  vertical-align: middle;
+}
+h1,h2,h3,h4,h5,h6 {
+  font-family: Georgia, Times, 'Times New Roman', Serif;
+}
+h1 {
+  letter-spacing: -0.05em;
+  word-spacing: -0.04em;
+}
+h2 {
+  letter-spacing: -0.03em;
+  word-spacing: -0.02em;
+}
+div {
+  border: 1px #300 solid;
+  margin: 1em;
+  padding: 0.5em;
+  padding-bottom: 50px;
+}
+div img {
+  float: right;
+  border: 1px #c99 solid;
+}
