@@ -36,6 +36,12 @@ Alternatively, you can try...
 
 Either way, there is a sample CSS file in the folder, so the resulting output can be saved to a file and opened in a web browser directly.
 
+If you would also prefer to avoid redirecting the output, a second command-line parameter can direct the program to an output file:
+
+    ./target/phauxfiles 10 profiles.html
+
+Phauxfiles will wipe the file, if it exists, before writing to it.
+
 Caveats
 -------
 
@@ -45,7 +51,9 @@ In the spirit of full disclosure...
 
  - At some point, I upgraded the Rust compiler.  It now has trouble with my use of `deriving(Encodable)`, but doesn't appear to yet know how to use the replacement, `deriving(RustcEncodable)`.  And `decodable`, of course.
 
- - The I/O needs to be cleaned up, especially since `cargo run` prints a brief header before the program output, which gets caught on redirecting to a file.  It might also be nice to be able to switch between HTML and text mode.
-
  - There appears to be a library that provides `getopt`-like functionality for command-line parameters, which seems like it would be productive to learn.  Right now, there is no validation except checking that the parameter is there.
+
+ - It might also be nice to be able to switch between HTML and text mode.
+
+ - More extensive profile information would be nice, though there don't seem to be any handy APIs to play with.  I may integrate quotes and cat pictures at some point, but that still doesn't flesh out the profile itself.
 
