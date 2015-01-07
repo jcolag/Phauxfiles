@@ -1,4 +1,6 @@
+extern crate getopts;
 extern crate serialize;
+use getopts::{optopt,optflag,getopts,OptGroup,usage};
 use serialize::json;
 use std::os;
 use std::str;
@@ -8,18 +10,35 @@ mod fauxperson;
 mod outfile;
 
 fn main() {
-    let args = os::args();
-    let mut count = "6";
+    let args: Vec<String> = os::args();
+    let program = args[0].clone();
+    let opts = &[
+        optopt("n", "number-of-entries", "set output file name", "COUNT"),
+        optopt("o", "output-file", "set output file name", "NAME"),
+        optflag("h", "help", "print this help menu")
+    ];
+    let matches = match getopts(args.tail(), opts) {
+        Ok(m) => { m }
+        Err(f) => { panic!(f.to_string()) }
+    };
+
     let mut out: outfile::FileIo;
 
-    if args.len() > 1 {
-        count = args[1].as_slice();
+    if matches.opt_present("h") {
+        print_usage(program.as_slice(), opts);
+        return;
     }
-    out = if args.len() > 2 {
-        outfile::FileIo::new(args[2].to_string())
-    } else {
-        outfile::FileIo::new("".to_string())
+    let count = match matches.opt_str("n") {
+        Some(x) => x.clone(),
+        None => "6".to_string(),
     };
+    let output = matches.opt_str("o");
+    let outname = match output {
+        Some(x) => x,
+        None => "".to_string(),
+    };
+
+    out = outfile::FileIo::new(outname);
 
     let path = format!("/?amount={}", count);
     let names = http_get("api.uinames.com", 80, path.as_slice());
@@ -35,6 +54,11 @@ fn main() {
         out.write(div.as_slice());
     }
     out.write("</body></html>");
+}
+
+fn print_usage(program: &str, opts: &[OptGroup]) {
+    let brief = format!("Usage: {} [options]", program);
+    print!("{}", usage(brief.as_slice(), opts));
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
