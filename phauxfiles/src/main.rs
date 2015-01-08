@@ -22,8 +22,6 @@ fn main() {
         Err(f) => { panic!(f.to_string()) }
     };
 
-    let mut out: outfile::FileIo;
-
     if matches.opt_present("h") {
         print_usage(program.as_slice(), opts);
         return;
@@ -38,7 +36,16 @@ fn main() {
         None => "".to_string(),
     };
 
-    out = outfile::FileIo::new(outname);
+    generate_page(outname, count);
+}
+
+fn print_usage(program: &str, opts: &[OptGroup]) {
+    let brief = format!("Usage: {} [options]", program);
+    print!("{}", usage(brief.as_slice(), opts));
+}
+
+fn generate_page(outfile_name: String, count: String) {
+    let mut out = outfile::FileIo::new(outfile_name);
 
     let path = format!("/?amount={}", count);
     let names = http_get("api.uinames.com", 80, path.as_slice());
@@ -54,11 +61,6 @@ fn main() {
         out.write(div.as_slice());
     }
     out.write("</body></html>");
-}
-
-fn print_usage(program: &str, opts: &[OptGroup]) {
-    let brief = format!("Usage: {} [options]", program);
-    print!("{}", usage(brief.as_slice(), opts));
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
