@@ -9,34 +9,22 @@ use fauxperson::{FauxPerson,FaceCollection};
 mod fauxperson;
 mod outfile;
 
+pub struct Arguments {
+    program_name: String,
+    entries: String,
+    filename: String,
+    exit: bool,
+}
+
 fn main() {
     let args: Vec<String> = os::args();
-    let program = args[0].clone();
-    let opts = &[
-        optopt("n", "number-of-entries", "set output file name", "COUNT"),
-        optopt("o", "output-file", "set output file name", "NAME"),
-        optflag("h", "help", "print this help menu")
-    ];
-    let matches = match getopts(args.tail(), opts) {
-        Ok(m) => { m }
-        Err(f) => { panic!(f.to_string()) }
-    };
+    let opts = parse_args(args);
 
-    if matches.opt_present("h") {
-        print_usage(program.as_slice(), opts);
+    if opts.exit {
         return;
     }
-    let count = match matches.opt_str("n") {
-        Some(x) => x.clone(),
-        None => "6".to_string(),
-    };
-    let output = matches.opt_str("o");
-    let outname = match output {
-        Some(x) => x,
-        None => "".to_string(),
-    };
 
-    generate_page(outname, count);
+    generate_page(opts.filename, opts.entries);
 }
 
 fn print_usage(program: &str, opts: &[OptGroup]) {
@@ -61,6 +49,43 @@ fn generate_page(outfile_name: String, count: String) {
         out.write(div.as_slice());
     }
     out.write("</body></html>");
+}
+
+fn parse_args(arguments: Vec<String>) -> Arguments {
+    let opts = &[
+        optopt("n", "number-of-entries", "set output file name", "COUNT"),
+        optopt("o", "output-file", "set output file name", "NAME"),
+        optflag("h", "help", "print this help menu")
+    ];
+
+    let matches = match getopts(arguments.tail(), opts) {
+        Ok(m) => { m }
+        Err(f) => { panic!(f.to_string()) }
+    };
+
+    let mut args = Arguments {
+        program_name: arguments[0].clone(),
+        entries: "".to_string(),
+        filename: "".to_string(),
+        exit: matches.opt_present("h"),
+    };
+
+    if args.exit {
+        print_usage(args.program_name.as_slice(), opts);
+    }
+
+    args.entries = match matches.opt_str("n") {
+        Some(x) => x.clone(),
+        None => "6".to_string(),
+    };
+
+    let output = matches.opt_str("o");
+    args.filename = match output {
+        Some(x) => x,
+        None => "".to_string(),
+    };
+
+    args
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
