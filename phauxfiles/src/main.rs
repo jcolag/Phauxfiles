@@ -34,21 +34,30 @@ fn print_usage(program: &str, opts: &[OptGroup]) {
 
 fn generate_page(outfile_name: String, count: String) {
     let mut out = outfile::FileIo::new(outfile_name);
+    let response = generate_page_text(count);
+    out.write(response.as_slice());
+}
 
+fn generate_page_text(count: String) -> String {
     let path = format!("/?amount={}", count);
     let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
-    out.write("<html><head><title>Fake Search Results</title>");
-    out.write("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
-    out.write("<link rel='stylesheet' href='format.css'");
-    out.write("</head><body>");
+    let html_a = "<html><head><title>Fake Search Results</title>";
+    let html_b = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
+    let html_c = "<link rel='stylesheet' href='format.css'";
+    let html_d = "</head><body>";
+    let mut html = format!("{}\n{}\n{}\n{}\n", html_a, html_b, html_c, html_d);
     for who in people.iter() {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
         let div = format!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
-        out.write(div.as_slice());
+/*        out.write(div.as_slice());*/
+        html = format!("{}{}\n", html, div);
     }
-    out.write("</body></html>");
+    let html_e = "</body></html>";
+    html = format!("{}{}", html, html_e);
+
+    html
 }
 
 fn parse_args(arguments: Vec<String>) -> Arguments {
