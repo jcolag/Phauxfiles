@@ -2,6 +2,8 @@ extern crate getopts;
 extern crate serialize;
 use getopts::{optopt,optflag,getopts,OptGroup,usage};
 use serialize::json;
+use std::io::{TcpListener};
+use std::io::{Acceptor, Listener};
 use std::os;
 use std::str;
 use fauxperson::{FauxPerson,FaceCollection};
@@ -13,6 +15,7 @@ pub struct Arguments {
     program_name: String,
     entries: String,
     filename: String,
+    port: Option<int>,
     exit: bool,
 }
 
@@ -24,7 +27,10 @@ fn main() {
         return;
     }
 
-    generate_page(opts.filename, opts.entries);
+    match opts.port {
+        Some(p) => serve_http(p, opts.entries),
+        None => generate_page(opts.filename, opts.entries),
+    }
 }
 
 fn print_usage(program: &str, opts: &[OptGroup]) {
@@ -51,7 +57,6 @@ fn generate_page_text(count: String) -> String {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
         let div = format!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
-/*        out.write(div.as_slice());*/
         html = format!("{}{}\n", html, div);
     }
     let html_e = "</body></html>";
@@ -64,6 +69,7 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     let opts = &[
         optopt("n", "number-of-entries", "set output file name", "COUNT"),
         optopt("o", "output-file", "set output file name", "NAME"),
+        optopt("s", "server-port", "run a web server", "SERVE"),
         optflag("h", "help", "print this help menu")
     ];
 
@@ -76,6 +82,7 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
         program_name: arguments[0].clone(),
         entries: "".to_string(),
         filename: "".to_string(),
+        port: None,
         exit: matches.opt_present("h"),
     };
 
@@ -94,7 +101,36 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
         None => "".to_string(),
     };
 
+    args.port = match matches.opt_str("s") {
+        Some(x) => x.as_slice().parse(),
+        None => None,
+    };
+
     args
+}
+
+fn serve_http(port: int, count: String) {
+    let localhost = format!("127.0.0.1:{}", port);
+    let listener = TcpListener::bind(localhost.as_slice()).unwrap();
+    let mut acceptor = listener.listen().unwrap();
+
+    for stream in acceptor.incoming() {
+        match stream {
+            Err(_) => { },
+            Ok(stream) => {
+                let mut s = stream.clone();
+                let mut buf = [0];
+                let _ = s.read(&mut buf);
+                let html = generate_page_text(count.clone());
+                let response = format!("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: {}\n\n{}\n", html.len(), html);
+                let _ = s.write(response.as_bytes());
+                drop(s);
+                drop(stream);
+            },
+        }
+    }
+
+    drop(acceptor);
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
