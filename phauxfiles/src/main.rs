@@ -13,8 +13,8 @@ mod outfile;
 
 pub struct Arguments {
     program_name: String,
-    entries: String,
-    filename: String,
+    entries: Option<int>,
+    filename: Option<String>,
     port: Option<int>,
     exit: bool,
 }
@@ -38,14 +38,20 @@ fn print_usage(program: &str, opts: &[OptGroup]) {
     print!("{}", usage(brief.as_slice(), opts));
 }
 
-fn generate_page(outfile_name: String, count: String) {
-    let mut out = outfile::FileIo::new(outfile_name);
+fn generate_page(outfile_name: Option<String>, count: Option<int>) {
+    let mut out = outfile::FileIo::new(match outfile_name {
+        Some(n) => n,
+        None => "".to_string(),
+    });
     let response = generate_page_text(count);
     out.write(response.as_slice());
 }
 
-fn generate_page_text(count: String) -> String {
-    let path = format!("/?amount={}", count);
+fn generate_page_text(count: Option<int>) -> String {
+    let path = format!("/?amount={}", match count {
+        Some(c) => c,
+        None => 6i,
+    });
     let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
     let html_a = "<html><head><title>Fake Search Results</title>";
@@ -80,8 +86,8 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
 
     let mut args = Arguments {
         program_name: arguments[0].clone(),
-        entries: "".to_string(),
-        filename: "".to_string(),
+        entries: None,
+        filename: None,
         port: None,
         exit: matches.opt_present("h"),
     };
@@ -91,15 +97,11 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     }
 
     args.entries = match matches.opt_str("n") {
-        Some(x) => x.clone(),
-        None => "6".to_string(),
+        Some(x) => x.as_slice().parse(),
+        None => None,
     };
 
-    let output = matches.opt_str("o");
-    args.filename = match output {
-        Some(x) => x,
-        None => "".to_string(),
-    };
+    args.filename = matches.opt_str("o");
 
     args.port = match matches.opt_str("s") {
         Some(x) => x.as_slice().parse(),
@@ -109,7 +111,7 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     args
 }
 
-fn serve_http(port: int, count: String) {
+fn serve_http(port: int, count: Option<int>) {
     let localhost = format!("127.0.0.1:{}", port);
     let listener = TcpListener::bind(localhost.as_slice()).unwrap();
     let mut acceptor = listener.listen().unwrap();
