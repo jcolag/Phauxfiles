@@ -3,3 +3,7 @@
 name = "phauxfiles"
 version = "0.0.1"
 authors = ["John Colagioia <john@colagioia.net>"]
+
+[dependencies]
+rustc-serialize = "*"
+

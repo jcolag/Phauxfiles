@@ -1,7 +1,7 @@
 extern crate getopts;
-extern crate serialize;
+extern crate "rustc-serialize" as rustc_serialize;
 use getopts::{optopt,optflag,getopts,OptGroup,usage};
-use serialize::json;
+use rustc_serialize::json;
 use std::io::{TcpListener};
 use std::io::{Acceptor, Listener};
 use std::os;
@@ -13,9 +13,9 @@ mod outfile;
 
 pub struct Arguments {
     program_name: String,
-    entries: Option<int>,
+    entries: Option<i16>,
     filename: Option<String>,
-    port: Option<int>,
+    port: Option<i16>,
     exit: bool,
 }
 
@@ -38,7 +38,7 @@ fn print_usage(program: &str, opts: &[OptGroup]) {
     print!("{}", usage(brief.as_slice(), opts));
 }
 
-fn generate_page(outfile_name: Option<String>, count: Option<int>) {
+fn generate_page(outfile_name: Option<String>, count: Option<i16>) {
     let mut out = outfile::FileIo::new(match outfile_name {
         Some(n) => n,
         None => "".to_string(),
@@ -47,10 +47,10 @@ fn generate_page(outfile_name: Option<String>, count: Option<int>) {
     out.write(response.as_slice());
 }
 
-fn generate_page_text(count: Option<int>) -> String {
+fn generate_page_text(count: Option<i16>) -> String {
     let path = format!("/?amount={}", match count {
         Some(c) => c,
-        None => 6i,
+        None => 6i16,
     });
     let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
@@ -111,7 +111,7 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     args
 }
 
-fn serve_http(port: int, count: Option<int>) {
+fn serve_http(port: i16, count: Option<i16>) {
     let localhost = format!("127.0.0.1:{}", port);
     let listener = TcpListener::bind(localhost.as_slice()).unwrap();
     let mut acceptor = listener.listen().unwrap();

@@ -1,6 +1,8 @@
+extern crate "rustc-serialize" as rustc_serialize;
 use std::fmt;
+use std::string;
 
-#[deriving(Decodable, Encodable)]
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct FauxPerson {
     name: String,
     surname: String,
@@ -19,7 +21,18 @@ impl fmt::Show for FauxPerson {
     }
 }
 
-#[deriving(Decodable, Encodable)]
+impl string::ToString for FauxPerson {
+    fn to_string(&self) -> String {
+        let (ref name, ref surname) = match self.country.as_slice() {
+            // Surnames still come first for Chinese names, presumably
+            "China" => (self.surname.clone(), self.name.clone()),
+            _ => (self.name.clone(), self.surname.clone()),
+        };
+        format!("<h2>{} {}</h2>\n{} from <strong>{}</strong>", name, surname, self.gender, self.country)
+     }
+}
+
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct ImageUrl {
     epic: String,
     bigger: String,
@@ -27,7 +40,7 @@ pub struct ImageUrl {
     mini: String,
 }
 
-#[deriving(Decodable, Encodable)]
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct FaceCollection {
     username: String,
     image_urls: ImageUrl,
@@ -36,6 +49,12 @@ pub struct FaceCollection {
 impl fmt::Show for FaceCollection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "<img src='{}'>", self.image_urls.epic)
+    }
+}
+
+impl string::ToString for FaceCollection {
+    fn to_string(&self) -> String {
+        format!("<img src='{}'>", self.image_urls.epic)
     }
 }
 
