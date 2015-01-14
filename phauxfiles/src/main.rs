@@ -1,6 +1,8 @@
 extern crate getopts;
 extern crate "rustc-serialize" as rustc_serialize;
+extern crate hyper;
 use getopts::{optopt,optflag,getopts,OptGroup,usage};
+use hyper::{Client};
 use rustc_serialize::json;
 use std::io::{TcpListener};
 use std::io::{Acceptor, Listener};
@@ -136,28 +138,13 @@ fn serve_http(port: i16, count: Option<i16>) {
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
-    let server = format!("{}:{}", host, port.to_string());
-    let request = format!("GET {} HTTP/1.0\nHost: {}\n\n", path.to_string(), host);
-    let mut socket = std::io::TcpStream::connect(server.as_slice()).unwrap();
-    let http_req_status = socket.write(request.as_bytes());
-
-    match http_req_status {
-        Ok(t) => t,
-        Err(e) => panic!(e),
-    }
-
-    let response = match socket.read_to_end() {
-        Ok(t) => t,
+    let url = format!("http://{}:{}{}", host, port, path);
+    let mut client = Client::new();
+    let mut res = client.get(url.as_slice()).send();
+    let mut response = match res {
+        Ok(x) => x,
         Err(e) => panic!(e),
     };
-
-    let structure = match str::from_utf8(response.as_slice()) {
-        Ok(t) => t,
-        Err(e) => panic!("Invalid UTF-8 sequence, {}", e),
-    };
-
-    let http_pieces = structure.split_str("\n");
-    let parts: Vec<&str> = http_pieces.collect();
-    parts[parts.len() - 1].to_string()
+    response.read_to_string().unwrap()
 }
 

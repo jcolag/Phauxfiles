@@ -6,4 +6,5 @@ authors = ["John Colagioia <john@colagioia.net>"]
 
 [dependencies]
 rustc-serialize = "*"
+hyper = "*"
 
