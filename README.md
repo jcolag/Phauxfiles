@@ -30,17 +30,19 @@ Alternatively, you can try...
 
     ./target/phauxfiles
 
-...which is the same thing, _except_ that you can add a command-line parameter to specify how many fake profiles will be generated, such as...
+...which is the same thing, _except_ that you can add a command-line parameter to specify how many fake profiles will be generated and whether to output to a specific file, such as...
 
-    ./target/phauxfiles 10
+|**Short Form**|**Long Form**|**Type** |**Default**|**Description**|
+|:------------:| ----------- |:-------:|:---------:| ------------- |
+| -h | --help                |         |           | Print help information |
+| -n | --number-of-profiles  | integer | 6         | Number of profiles to include |
+| -o | --output-file         | string  |           | Name of output file |
 
-Either way, there is a sample CSS file in the folder, so the resulting output can be saved to a file and opened in a web browser directly.
+If an output file is specified, _Phauxfiles_ overwrites it with the output.  If none is specified, it prints the output to `stdout`.
 
-If you would also prefer to avoid redirecting the output, a second command-line parameter can direct the program to an output file:
+There is a sample CSS file in the folder referenced by the HTML output, so the resulting output can be opened in a web browser directly.
 
-    ./target/phauxfiles 10 profiles.html
-
-Phauxfiles will wipe the file, if it exists, before writing to it.
+Please note that there appears to be a conflict between `getopts` and execution via `cargo run`.
 
 Caveats
 -------
@@ -50,8 +52,6 @@ In the spirit of full disclosure...
  - As mentioned above, this _really_ should be written with a solid HTTP library.  It's a safe bet that I'm not implementing nearly enough of the specification for robust reactions to error conditions, let alone being able to negotiate with the servers if it ever becomes necessary.
 
  - At some point, I upgraded the Rust compiler.  It now has trouble with my use of `deriving(Encodable)`, but doesn't appear to yet know how to use the replacement, `deriving(RustcEncodable)`.  And `decodable`, of course.
-
- - There appears to be a library that provides `getopt`-like functionality for command-line parameters, which seems like it would be productive to learn.  Right now, there is no validation except checking that the parameter is there.
 
  - It might also be nice to be able to switch between HTML and text mode.
 
