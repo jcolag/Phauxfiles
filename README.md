@@ -30,13 +30,14 @@ Alternatively, you can try...
 
     ./target/phauxfiles
 
-...which is the same thing, _except_ that you can add a command-line parameter to specify how many fake profiles will be generated and whether to output to a specific file, such as...
+...which is the same thing, _except_ that you can add a command-line parameter to specify how many fake profiles will be generated and whether to output to a specific file or served across HTTP, such as...
 
 |**Short Form**|**Long Form**|**Type** |**Default**|**Description**|
 |:------------:| ----------- |:-------:|:---------:| ------------- |
 | -h | --help                |         |           | Print help information |
 | -n | --number-of-profiles  | integer | 6         | Number of profiles to include |
 | -o | --output-file         | string  |           | Name of output file |
+| -s | --server              | integer |           | Serves the page from an HTTP server on the port |
 
 If an output file is specified, _Phauxfiles_ overwrites it with the output.  If none is specified, it prints the output to `stdout`.
 
