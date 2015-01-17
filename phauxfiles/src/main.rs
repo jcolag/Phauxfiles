@@ -7,7 +7,6 @@ use rustc_serialize::json;
 use std::io::{TcpListener};
 use std::io::{Acceptor, Listener};
 use std::os;
-use std::str;
 use fauxperson::{FauxPerson,FaceCollection};
 
 mod fauxperson;
@@ -140,7 +139,7 @@ fn serve_http(port: i16, count: Option<i16>) {
 fn http_get(host: &str, port: i32, path: &str) -> String {
     let url = format!("http://{}:{}{}", host, port, path);
     let mut client = Client::new();
-    let mut res = client.get(url.as_slice()).send();
+    let res = client.get(url.as_slice()).send();
     let mut response = match res {
         Ok(x) => x,
         Err(e) => panic!(e),
