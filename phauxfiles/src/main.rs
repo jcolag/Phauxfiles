@@ -2,10 +2,12 @@ extern crate getopts;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate hyper;
 use getopts::{optopt,optflag,getopts,OptGroup,usage};
-use hyper::{Client};
+use hyper::{Client, Get};
+use hyper::header::common::ContentLength;
+use hyper::server::{Server, Request, Response};
+use hyper::uri::RequestUri::AbsolutePath;
 use rustc_serialize::json;
-use std::io::{TcpListener};
-use std::io::{Acceptor, Listener};
+use std::io::net::ip::Ipv4Addr;
 use std::os;
 use fauxperson::{FauxPerson,FaceCollection};
 
@@ -16,7 +18,7 @@ pub struct Arguments {
     program_name: String,
     entries: Option<i16>,
     filename: Option<String>,
-    port: Option<i16>,
+    port: Option<u16>,
     exit: bool,
 }
 
@@ -112,28 +114,35 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     args
 }
 
-fn serve_http(port: i16, count: Option<i16>) {
-    let localhost = format!("127.0.0.1:{}", port);
-    let listener = TcpListener::bind(localhost.as_slice()).unwrap();
-    let mut acceptor = listener.listen().unwrap();
-
-    for stream in acceptor.incoming() {
-        match stream {
-            Err(_) => { },
-            Ok(stream) => {
-                let mut s = stream.clone();
-                let mut buf = [0];
-                let _ = s.read(&mut buf);
-                let html = generate_page_text(count.clone());
-                let response = format!("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: {}\n\n{}\n", html.len(), html);
-                let _ = s.write(response.as_bytes());
-                drop(s);
-                drop(stream);
+fn return_page(req: Request, mut res: Response) {
+    match req.uri {
+        AbsolutePath(ref path) => match (&req.method, path.as_slice()) {
+            (&Get, "/") => {
+                let html = generate_page_text("6".parse());
+                let out = html.as_bytes();
+                res.headers_mut().set(ContentLength(out.len() as u64));
+                let mut res = res.start();
+                res.write(out).unwrap();
+                res.unwrap().end().unwrap();
+                return;
             },
-        }
+            _ => {
+                *res.status_mut() = hyper::NotFound;
+                res.start().and_then(|res| res.end()).unwrap();
+                return;
+            },
+        },
+        _ => {
+            res.start().and_then(|res| res.end()).unwrap();
+            return;
+        },
     }
+}
 
-    drop(acceptor);
+fn serve_http(port: u16, count: Option<i16>) {
+    let server = Server::http(Ipv4Addr(127, 0, 0, 1), port);
+    let mut listening = server.listen(return_page).unwrap();
+    listening.await();
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
