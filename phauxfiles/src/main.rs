@@ -7,6 +7,7 @@ use hyper::header::common::ContentLength;
 use hyper::server::{Server, Request, Response};
 use hyper::uri::RequestUri::AbsolutePath;
 use rustc_serialize::json;
+use std::io::File;
 use std::io::net::ip::Ipv4Addr;
 use std::os;
 use fauxperson::{FauxPerson,FaceCollection};
@@ -120,6 +121,23 @@ fn return_page(req: Request, mut res: Response) {
             (&Get, "/") => {
                 let html = generate_page_text("6".parse());
                 let out = html.as_bytes();
+                res.headers_mut().set(ContentLength(out.len() as u64));
+                let mut res = res.start();
+                res.write(out).unwrap();
+                res.unwrap().end().unwrap();
+                return;
+            },
+            (&Get, "/format.css") => {
+                let path = Path::new("format.css");
+                let mut file = match File::open(&path) {
+                    Ok(f) => f,
+                    Err(_) => { return; },
+                };
+                let css = match file.read_to_string() {
+                    Ok(s) => s,
+                    Err(_) => { return; },
+                };
+                let out = css.as_bytes();
                 res.headers_mut().set(ContentLength(out.len() as u64));
                 let mut res = res.start();
                 res.write(out).unwrap();
