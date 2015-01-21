@@ -58,9 +58,9 @@ fn generate_page_text(count: Option<i16>) -> String {
     });
     let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
-    let html_a = "<html><head><title>Fake Search Results</title>";
+    let html_a = "<!DOCTYPE html>\n<html>\n<head><title>Fake Search Results</title>";
     let html_b = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-    let html_c = "<link rel='stylesheet' href='format.css'";
+    let html_c = "<link rel='stylesheet' href='format.css'>";
     let html_d = "</head><body>";
     let mut html = format!("{}\n{}\n{}\n{}\n", html_a, html_b, html_c, html_d);
     for who in people.iter() {
