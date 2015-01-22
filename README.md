@@ -39,7 +39,7 @@ Alternatively, you can try...
 
 If an output file is specified, _Phauxfiles_ overwrites it with the output.  If none is specified, it prints the output to `stdout`.
 
-There is a sample CSS file in the folder referenced by the HTML output, so the resulting output can be opened in a web browser directly.
+There is a sample CSS file in the folder referenced by the HTML output, so the resulting output can be opened in a web browser directly.  In "server mode," the CSS file will be served out of the current directory.  Files are "white-listed," so there is no security concern unless you edit `format.css` to include information that should be secure.
 
 Please note that there appears to be a conflict between `getopts` and execution via `cargo run`.
 
