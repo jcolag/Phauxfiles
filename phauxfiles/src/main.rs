@@ -117,38 +117,40 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
 
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
-        AbsolutePath(ref path) => match (&req.method, path.as_slice()) {
-            (&Get, "/") => {
-                let html = generate_page_text("6".parse());
-                let out = html.as_bytes();
-                res.headers_mut().set(ContentLength(out.len() as u64));
-                let mut res = res.start();
-                res.write(out).unwrap();
-                res.unwrap().end().unwrap();
-                return;
-            },
-            (&Get, "/format.css") => {
-                let path = Path::new("format.css");
-                let mut file = match File::open(&path) {
-                    Ok(f) => f,
-                    Err(_) => { return; },
-                };
-                let css = match file.read_to_string() {
-                    Ok(s) => s,
-                    Err(_) => { return; },
-                };
-                let out = css.as_bytes();
-                res.headers_mut().set(ContentLength(out.len() as u64));
-                let mut res = res.start();
-                res.write(out).unwrap();
-                res.unwrap().end().unwrap();
-                return;
-            },
-            _ => {
-                *res.status_mut() = hyper::NotFound;
-                res.start().and_then(|res| res.end()).unwrap();
-                return;
-            },
+        AbsolutePath(ref path) => {
+            match (&req.method, path.as_slice()) {
+                (&Get, "/") => {
+                    let html = generate_page_text("6".parse());
+                    let out = html.as_bytes();
+                    res.headers_mut().set(ContentLength(out.len() as u64));
+                    let mut res = res.start();
+                    res.write(out).unwrap();
+                    res.unwrap().end().unwrap();
+                    return;
+                },
+                (&Get, "/format.css") => {
+                    let path = Path::new("format.css");
+                    let mut file = match File::open(&path) {
+                        Ok(f) => f,
+                        Err(_) => { return; },
+                    };
+                    let css = match file.read_to_string() {
+                        Ok(s) => s,
+                        Err(_) => { return; },
+                    };
+                    let out = css.as_bytes();
+                    res.headers_mut().set(ContentLength(out.len() as u64));
+                    let mut res = res.start();
+                    res.write(out).unwrap();
+                    res.unwrap().end().unwrap();
+                    return;
+                },
+                _ => {
+                    *res.status_mut() = hyper::NotFound;
+                    res.start().and_then(|res| res.end()).unwrap();
+                    return;
+                },
+            }
         },
         _ => {
             res.start().and_then(|res| res.end()).unwrap();
