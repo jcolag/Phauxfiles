@@ -117,10 +117,36 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
 
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
-        AbsolutePath(ref path) => {
+        AbsolutePath(ref p) => {
+            let mut count = "6";
+            let mut path = p.clone();
+
+            if path.contains("?") {
+                let mut part = 1;
+                for i in p.split_str("?") {
+                    if part == 1 {
+                        path = i.to_string();
+                    }
+                    let mut name = true;
+                    let mut found = false;
+                    for var in i.split_str("&") {
+                        for term in var.split_str("=") {
+                            if found {
+                                count = term;
+                            }
+                            if name && term == "count" {
+                                found = true;
+                            }
+                            name = false;
+                        }
+                    }
+                    part = part + 1;
+                }
+            }
+
             match (&req.method, path.as_slice()) {
                 (&Get, "/") => {
-                    let html = generate_page_text("6".parse());
+                    let html = generate_page_text(count.parse());
                     let out = html.as_bytes();
                     res.headers_mut().set(ContentLength(out.len() as u64));
                     let mut res = res.start();
