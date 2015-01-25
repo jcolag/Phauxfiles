@@ -7,6 +7,7 @@ use hyper::header::common::ContentLength;
 use hyper::server::{Server, Request, Response};
 use hyper::uri::RequestUri::AbsolutePath;
 use rustc_serialize::json;
+use std::collections::HashMap;
 use std::io::File;
 use std::io::net::ip::Ipv4Addr;
 use std::os;
@@ -115,33 +116,47 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     args
 }
 
+fn parse_url(path: String) -> (String, HashMap<String, String>) {
+    let mut args: HashMap<String, String> = HashMap::new();
+    let mut out_path = path.clone();
+
+    if out_path.contains("?") {
+        let mut part = 1;
+        for i in path.split_str("?") {
+            if part == 1 {
+                out_path = i.to_string();
+            } else {
+                let mut name = true;
+                let mut found = false;
+                for var in i.split_str("&") {
+                    let mut key = "".to_string();
+                    let mut value = "".to_string();
+                    for term in var.split_str("=") {
+                        if name {
+                            key = term.to_string();
+                        } else {
+                            value = term.to_string();
+                        }
+                        name = false;
+                    }
+                    args.insert(key, value);
+                }
+            }
+            part = part + 1;
+        }
+    }
+
+    (out_path, args)
+}
+
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
         AbsolutePath(ref p) => {
             let mut count = "6";
-            let mut path = p.clone();
+            let (path, args) = parse_url(p.clone());
 
-            if path.contains("?") {
-                let mut part = 1;
-                for i in p.split_str("?") {
-                    if part == 1 {
-                        path = i.to_string();
-                    }
-                    let mut name = true;
-                    let mut found = false;
-                    for var in i.split_str("&") {
-                        for term in var.split_str("=") {
-                            if found {
-                                count = term;
-                            }
-                            if name && term == "count" {
-                                found = true;
-                            }
-                            name = false;
-                        }
-                    }
-                    part = part + 1;
-                }
+            if args.contains_key("count") {
+                count = args.get("count").unwrap().as_slice();
             }
 
             match (&req.method, path.as_slice()) {
