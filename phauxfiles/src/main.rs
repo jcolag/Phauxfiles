@@ -118,32 +118,24 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
 
 fn parse_url(path: String) -> (String, HashMap<String, String>) {
     let mut args: HashMap<String, String> = HashMap::new();
-    let mut out_path = path.clone();
+    let mut path_parts = path.split_str("?");
+    let out_path = path_parts.next().unwrap().to_string();
+    let query = match path_parts.next() {
+        Some(s) => s.to_string(),
+        None => return (out_path, args),
+    };
 
-    if out_path.contains("?") {
-        let mut part = 1;
-        for i in path.split_str("?") {
-            if part == 1 {
-                out_path = i.to_string();
-            } else {
-                let mut name = true;
-                let mut found = false;
-                for var in i.split_str("&") {
-                    let mut key = "".to_string();
-                    let mut value = "".to_string();
-                    for term in var.split_str("=") {
-                        if name {
-                            key = term.to_string();
-                        } else {
-                            value = term.to_string();
-                        }
-                        name = false;
-                    }
-                    args.insert(key, value);
-                }
-            }
-            part = part + 1;
-        }
+    for var in query.split_str("&") {
+        let mut var_parts = var.split_str("=");
+        let key = match var_parts.next() {
+            Some(s) => s.to_string(),
+            None => continue,
+        };
+        let value = match var_parts.next() {
+            Some(s) => s.to_string(),
+            None => "".to_string(),
+        };
+        args.insert(key, value);
     }
 
     (out_path, args)
