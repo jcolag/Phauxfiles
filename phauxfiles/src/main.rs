@@ -15,6 +15,7 @@ use fauxperson::{FauxPerson,FaceCollection};
 
 mod fauxperson;
 mod outfile;
+mod absurl;
 
 pub struct Arguments {
     program_name: String,
@@ -116,42 +117,16 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     args
 }
 
-fn parse_url(path: String) -> (String, HashMap<String, String>) {
-    let mut args: HashMap<String, String> = HashMap::new();
-    let mut path_parts = path.split_str("?");
-    let out_path = path_parts.next().unwrap().to_string();
-    let query = match path_parts.next() {
-        Some(s) => s.to_string(),
-        None => return (out_path, args),
-    };
-
-    for var in query.split_str("&") {
-        let mut var_parts = var.split_str("=");
-        let key = match var_parts.next() {
-            Some(s) => s.to_string(),
-            None => continue,
-        };
-        let value = match var_parts.next() {
-            Some(s) => s.to_string(),
-            None => "".to_string(),
-        };
-        args.insert(key, value);
-    }
-
-    (out_path, args)
-}
-
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
         AbsolutePath(ref p) => {
             let mut count = "6";
-            let (path, args) = parse_url(p.clone());
-
-            if args.contains_key("count") {
-                count = args.get("count").unwrap().as_slice();
+            let url = absurl::AbsUrl::new(p);
+            if url.args.contains_key("count") {
+                count = url.args.get("count").unwrap().as_slice();
             }
 
-            match (&req.method, path.as_slice()) {
+            match (&req.method, url.path.as_slice()) {
                 (&Get, "/") => {
                     let html = generate_page_text(count.parse());
                     let out = html.as_bytes();
