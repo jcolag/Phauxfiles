@@ -120,11 +120,8 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
         AbsolutePath(ref p) => {
-            let mut count = "6";
             let url = absurl::AbsUrl::new(p);
-            if url.args.contains_key("count") {
-                count = url.args.get("count").unwrap().as_slice();
-            }
+            let count = url.get("count".to_string(), "6".to_string());
 
             match (&req.method, url.path.as_slice()) {
                 (&Get, "/") => {

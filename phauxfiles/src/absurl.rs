@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 pub struct AbsUrl {
     pub path: String,
-    pub args: HashMap<String, String>,
+    args: HashMap<String, String>,
 }
 
 impl AbsUrl {
@@ -33,6 +33,14 @@ impl AbsUrl {
         AbsUrl {
             path: out_path,
             args: args,
+        }
+    }
+
+    pub fn get(&self, key: String, default: String) -> String {
+        if self.args.contains_key(key.as_slice()) {
+            self.args.get("count").unwrap().to_string()
+        } else {
+            default
         }
     }
 }
