@@ -38,7 +38,7 @@ impl AbsUrl {
 
     pub fn get(&self, key: String, default: String) -> String {
         if self.args.contains_key(key.as_slice()) {
-            self.args.get("count").unwrap().to_string()
+            Some(self.args.get(key.as_slice()).unwrap().to_string())
         } else {
             default
         }
