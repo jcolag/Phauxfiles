@@ -121,7 +121,7 @@ fn return_page(req: Request, mut res: Response) {
     match req.uri {
         AbsolutePath(ref p) => {
             let url = absurl::AbsUrl::new(p);
-            let count = url.get("count".to_string(), "6".to_string());
+            let count = url.get("count".to_string(), Some("6".to_string())).unwrap();
 
             match (&req.method, url.path.as_slice()) {
                 (&Get, "/") => {
