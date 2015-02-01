@@ -49,14 +49,20 @@ fn generate_page(outfile_name: Option<String>, count: Option<i16>) {
         Some(n) => n,
         None => "".to_string(),
     });
-    let response = generate_page_text(count);
+    let response = generate_page_text(count, None, None);
     out.write(response.as_slice());
 }
 
-fn generate_page_text(count: Option<i16>) -> String {
-    let path = format!("/?amount={}", match count {
+fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<String>) -> String {
+    let path = format!("/?amount={}{}{}", match count {
         Some(c) => c,
         None => 6i16,
+    }, match country {
+        Some(c) => format!("&country={}", c),
+        None => "".to_string(),
+    }, match sex {
+        Some(s) => format!("&gender={}", s),
+        None => "".to_string(),
     });
     let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
@@ -122,10 +128,12 @@ fn return_page(req: Request, mut res: Response) {
         AbsolutePath(ref p) => {
             let url = absurl::AbsUrl::new(p);
             let count = url.get("count".to_string(), Some("6".to_string())).unwrap();
+            let nation = url.get("where".to_string(), None);
+            let sex = url.get("sex".to_string(), None);
 
             match (&req.method, url.path.as_slice()) {
                 (&Get, "/") => {
-                    let html = generate_page_text(count.parse());
+                    let html = generate_page_text(count.parse(), nation, sex);
                     let out = html.as_bytes();
                     res.headers_mut().set(ContentLength(out.len() as u64));
                     let mut res = res.start();
