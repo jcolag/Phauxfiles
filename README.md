@@ -43,6 +43,21 @@ There is a sample CSS file in the folder referenced by the HTML output, so the r
 
 Please note that there appears to be a conflict between `getopts` and execution via `cargo run`.
 
+Web Server
+----------
+
+Running the web server allows a more flexible usage, by parsing the URL query parameters.
+
+|**Name**|**Type** |**Description**|
+|:------:|:-------:| ------------- |
+| count  | integer | Number of profiles to include   |
+| where  | string  | Country of origin for the names |
+| sex    | string  | Gender to select for the names  |
+
+Due to the limits of the UINames API, the `where` and `sex` parameters must be valid for UINames.  See their site for details.
+
+Assuming that the server listens on port 8080, an example usage might be <http://localhost:8080?count=5&where=india&sex=female>, giving five random female Indian names with random avatar images.
+
 Caveats
 -------
 
