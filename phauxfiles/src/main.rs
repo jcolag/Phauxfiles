@@ -129,7 +129,7 @@ fn return_page(req: Request, mut res: Response) {
             let url = absurl::AbsUrl::new(p);
             let count = url.get("count".to_string(), Some("6".to_string())).unwrap();
             let nation = url.get("where".to_string(), None);
-            let sex = url.get("sex".to_string(), None);
+            let sex = validate_gender(url.get("sex".to_string(), None));
 
             match (&req.method, url.path.as_slice()) {
                 (&Get, "/") => {
@@ -189,3 +189,13 @@ fn http_get(host: &str, port: i32, path: &str) -> String {
     response.read_to_string().unwrap()
 }
 
+fn validate_gender(sex: Option<String>) -> Option<String> {
+    match sex {
+        None => None,
+        Some(s) => match s.as_slice() {
+            "m" | "M" | "male" => Some("male".to_string()),
+            "f" | "F" | "female" => Some("female".to_string()),
+            _ => None,
+        }
+    }
+}
