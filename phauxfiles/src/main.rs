@@ -189,12 +189,16 @@ fn http_get(host: &str, port: i32, path: &str) -> String {
     response.read_to_string().unwrap()
 }
 
+fn slice_to_stropt(s: &str) -> Option<String> {
+    Some(s.to_string())
+}
+
 fn validate_gender(sex: Option<String>) -> Option<String> {
     match sex {
         None => None,
         Some(s) => match s.as_slice() {
-            "m" | "M" | "male" => Some("male".to_string()),
-            "f" | "F" | "female" => Some("female".to_string()),
+            "m" | "M" | "male" => slice_to_stropt("male"),
+            "f" | "F" | "female" => slice_to_stropt("female"),
             _ => None,
         }
     }
