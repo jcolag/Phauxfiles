@@ -69,16 +69,17 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
     let html_a = "<!DOCTYPE html>\n<html>\n<head><title>Fake Search Results</title>";
     let html_b = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
     let html_c = "<link rel='stylesheet' href='format.css'>";
-    let html_d = "</head><body>";
-    let mut html = format!("{}\n{}\n{}\n{}\n", html_a, html_b, html_c, html_d);
+    let html_d = "<link rel='shortcut icon' href='favicon.ico' />";
+    let html_e = "</head><body>";
+    let mut html = format!("{}\n{}\n{}\n{}\n{}\n", html_a, html_b, html_c, html_d, html_e);
     for who in people.iter() {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
         let div = format!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
         html = format!("{}{}\n", html, div);
     }
-    let html_e = "</body></html>";
-    html = format!("{}{}", html, html_e);
+    let html_f = "</body></html>";
+    html = format!("{}{}", html, html_f);
 
     html
 }
@@ -135,6 +136,23 @@ fn return_page(req: Request, mut res: Response) {
                 (&Get, "/") => {
                     let html = generate_page_text(count.parse(), nation, sex);
                     let out = html.as_bytes();
+                    res.headers_mut().set(ContentLength(out.len() as u64));
+                    let mut res = res.start();
+                    res.write(out).unwrap();
+                    res.unwrap().end().unwrap();
+                    return;
+                },
+                (&Get, "/favicon.ico") => {
+                    let path = Path::new("favicon.ico");
+                    let mut file = match File::open(&path) {
+                        Ok(f) => f,
+                        Err(_) => { return; },
+                    };
+                    let css = match file.read_to_string() {
+                        Ok(s) => s,
+                        Err(_) => { return; },
+                    };
+                    let out = css.as_bytes();
                     res.headers_mut().set(ContentLength(out.len() as u64));
                     let mut res = res.start();
                     res.write(out).unwrap();
