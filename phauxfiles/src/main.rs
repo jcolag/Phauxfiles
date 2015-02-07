@@ -124,6 +124,24 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
     args
 }
 
+fn serve_file(mut res: Response, name: &str) {
+println!("{}", name);
+    let path = Path::new(name);
+    let mut file = match File::open(&path) {
+        Ok(f) => f,
+        Err(_) => { return; },
+    };
+        let css = match file.read_to_string() {
+        Ok(s) => s,
+        Err(_) => { return; },
+    };
+    let out = css.as_bytes();
+    res.headers_mut().set(ContentLength(out.len() as u64));
+    let mut res = res.start();
+    res.write(out).unwrap();
+    res.unwrap().end().unwrap();
+}
+
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
         AbsolutePath(ref p) => {
@@ -143,37 +161,11 @@ fn return_page(req: Request, mut res: Response) {
                     return;
                 },
                 (&Get, "/favicon.ico") => {
-                    let path = Path::new("favicon.ico");
-                    let mut file = match File::open(&path) {
-                        Ok(f) => f,
-                        Err(_) => { return; },
-                    };
-                    let css = match file.read_to_string() {
-                        Ok(s) => s,
-                        Err(_) => { return; },
-                    };
-                    let out = css.as_bytes();
-                    res.headers_mut().set(ContentLength(out.len() as u64));
-                    let mut res = res.start();
-                    res.write(out).unwrap();
-                    res.unwrap().end().unwrap();
+                    serve_file(res, "favicon.ico");
                     return;
                 },
                 (&Get, "/format.css") => {
-                    let path = Path::new("format.css");
-                    let mut file = match File::open(&path) {
-                        Ok(f) => f,
-                        Err(_) => { return; },
-                    };
-                    let css = match file.read_to_string() {
-                        Ok(s) => s,
-                        Err(_) => { return; },
-                    };
-                    let out = css.as_bytes();
-                    res.headers_mut().set(ContentLength(out.len() as u64));
-                    let mut res = res.start();
-                    res.write(out).unwrap();
-                    res.unwrap().end().unwrap();
+                    serve_file(res, "format.css");
                     return;
                 },
                 _ => {
