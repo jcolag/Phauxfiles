@@ -54,11 +54,58 @@ Running the web server allows a more flexible usage, by parsing the URL query pa
 | where  | string  | Country of origin for the names |
 | sex    | string  | Gender to select for the names  |
 
-Due to the limits of the UINames API, the `where` parameter must be valid for UINames.  See their site for details.
-
 The `sex` parameter is validated by Phauxfiles as one of `m`, `M`, `male`, `f`, `F`, or `female`.
 
-Assuming that the server listens on port 8080, an example usage might be <http://localhost:8080?count=5&where=india&sex=f>, giving five random female Indian names with random avatar images.
+The `where` parameter is also validated, turning ISO country codes into country names known to be valid for UINames, which include the following:
+
+|**Abbreviation**|**Country** |
+|:--------------:|:---------  |
+| al | Albania                |
+| ar | Argentina              |
+| au | Australia              |
+| at | Austria                |
+| az | Azerbaijan             |
+| bd | Bangladesh             |
+| be | Belgium                |
+| ba | Bosnia and Herzegovina |
+| br | Brazil                 |
+| ca | Canada                 |
+| cn | China                  |
+| co | Colombia               |
+| dk | Denmark                |
+| eg | Egypt                  |
+| gb | England                |
+| fi | Finland                |
+| fr | France                 |
+| ge | Georgia                |
+| de | Germany                |
+| gr | Greece                 |
+| hu | Hungary                |
+| in | India                  |
+| ir | Iran                   |
+| il | Israel                 |
+| it | Italy                  |
+| jp | Japan                  |
+| mx | Mexico                 |
+| ma | Morocco                |
+| nl | Netherlands            |
+| nz | New Zealand            |
+| ng | Nigeria                |
+| pl | Poland                 |
+| pt | Portugal               |
+| ro | Romania                |
+| ru | Russia                 |
+| es | Spain                  |
+| se | Sweden                 |
+| ch | Switzerland            |
+| tr | Turkey                 |
+| ua | Ukraine                |
+| us | United States          |
+| vn | Vietnam                |
+
+Note that using the country's full name is no longer accepted by Phauxfiles and the abbreviations must currently be lowercase.  If the code is not recognized, it is eliminated, reverting to the default random behavior.
+
+Assuming that the server listens on port 8080, an example usage might be <http://localhost:8080?count=5&where=in&sex=f>, giving five random female Indian names with random avatar images.
 
 Caveats
 -------
