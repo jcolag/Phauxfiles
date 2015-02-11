@@ -127,7 +127,6 @@ fn parse_args(arguments: Vec<String>) -> Arguments {
 }
 
 fn serve_file(mut res: Response, name: &str) {
-println!("{}", name);
     let path = Path::new(name);
     let mut file = match File::open(&path) {
         Ok(f) => f,
