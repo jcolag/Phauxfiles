@@ -18,18 +18,11 @@ mod fauxperson;
 mod outfile;
 mod absurl;
 mod validate;
-
-pub struct Arguments {
-    program_name: String,
-    entries: Option<i16>,
-    filename: Option<String>,
-    port: Option<u16>,
-    exit: bool,
-}
+mod args;
 
 fn main() {
     let args: Vec<String> = os::args();
-    let opts = parse_args(args);
+    let opts = args::parse_args(args);
 
     if opts.exit {
         return;
@@ -39,11 +32,6 @@ fn main() {
         Some(p) => serve_http(p, opts.entries),
         None => generate_page(opts.filename, opts.entries),
     }
-}
-
-fn print_usage(program: &str, opts: &[OptGroup]) {
-    let brief = format!("Usage: {} [options]", program);
-    print!("{}", usage(brief.as_slice(), opts));
 }
 
 fn generate_page(outfile_name: Option<String>, count: Option<i16>) {
@@ -84,46 +72,6 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
     html = format!("{}{}", html, html_f);
 
     html
-}
-
-fn parse_args(arguments: Vec<String>) -> Arguments {
-    let opts = &[
-        optopt("n", "number-of-entries", "set output file name", "COUNT"),
-        optopt("o", "output-file", "set output file name", "NAME"),
-        optopt("s", "server-port", "run a web server", "SERVE"),
-        optflag("h", "help", "print this help menu")
-    ];
-
-    let matches = match getopts(arguments.tail(), opts) {
-        Ok(m) => { m }
-        Err(f) => { panic!(f.to_string()) }
-    };
-
-    let mut args = Arguments {
-        program_name: arguments[0].clone(),
-        entries: None,
-        filename: None,
-        port: None,
-        exit: matches.opt_present("h"),
-    };
-
-    if args.exit {
-        print_usage(args.program_name.as_slice(), opts);
-    }
-
-    args.entries = match matches.opt_str("n") {
-        Some(x) => x.as_slice().parse(),
-        None => None,
-    };
-
-    args.filename = matches.opt_str("o");
-
-    args.port = match matches.opt_str("s") {
-        Some(x) => x.as_slice().parse(),
-        None => None,
-    };
-
-    args
 }
 
 fn serve_file(mut res: Response, name: &str) {
