@@ -69,9 +69,7 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
         html = format!("{}{}\n", html, div);
     }
     let html_f = "</body></html>";
-    html = format!("{}{}", html, html_f);
-
-    html
+    format!("{}{}", html, html_f)
 }
 
 fn serve_file(mut res: Response, name: &str) {
