@@ -78,7 +78,7 @@ fn serve_file(mut res: Response, name: &str) {
         Ok(f) => f,
         Err(_) => { return; },
     };
-        let css = match file.read_to_string() {
+    let css = match file.read_to_string() {
         Ok(s) => s,
         Err(_) => { return; },
     };
