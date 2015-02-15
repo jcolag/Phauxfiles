@@ -56,20 +56,22 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
     });
     let names = http_get("api.uinames.com", 80, path.as_slice());
     let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
-    let html_a = "<!DOCTYPE html>\n<html>\n<head><title>Fake Search Results</title>";
-    let html_b = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-    let html_c = "<link rel='stylesheet' href='format.css'>";
-    let html_d = "<link rel='shortcut icon' href='favicon.ico' />";
-    let html_e = "</head><body>";
-    let mut html = format!("{}\n{}\n{}\n{}\n{}\n", html_a, html_b, html_c, html_d, html_e);
+    let path = Path::new("template.html");
+    let mut file = match File::open(&path) {
+        Ok(f) => f,
+        Err(_) => { return "".to_string(); },
+    };
+    let mut html = match file.read_to_string() {
+        Ok(s) => s,
+        Err(_) => { return "".to_string(); },
+    };
     for who in people.iter() {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
         let div = format!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
         html = format!("{}{}\n", html, div);
     }
-    let html_f = "</body></html>";
-    format!("{}{}", html, html_f)
+    format!("{}</body></html>", html)
 }
 
 fn serve_file(mut res: Response, name: &str) {
