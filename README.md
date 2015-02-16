@@ -105,7 +105,7 @@ The `where` parameter is also validated, turning ISO country codes into country 
 
 Note that using the country's full name is no longer accepted by Phauxfiles and the abbreviations must currently be lowercase.  If the code is not recognized, it is eliminated, reverting to the default random behavior.
 
-Assuming that the server listens on port 8080, an example usage might be <http://localhost:8080?count=5&where=in&sex=f>, giving five random female Indian names with random avatar images.
+Assuming that the server listens on port 8080, an example usage might be <`http://localhost:8080?count=5&where=in&sex=f`>, giving five random female Indian names with random avatar images.
 
 Caveats
 -------
