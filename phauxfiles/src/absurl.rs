@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::hash_map::{Iter,Keys};
 
 pub struct AbsUrl {
     pub path: String,
@@ -43,5 +44,13 @@ impl AbsUrl {
         } else {
             default
         }
+    }
+
+    pub fn keys(&self) -> Keys<String, String> {
+        self.args.keys()
+    }
+
+    pub fn iter(&self) -> Iter<String, String> {
+        self.args.iter()
     }
 }
