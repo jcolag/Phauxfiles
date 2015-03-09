@@ -1,4 +1,5 @@
-use std::io::File;
+use std::fs::File;
+use std::io::Write;
 
 pub struct FileIo {
     filename: String,
@@ -25,7 +26,7 @@ impl FileIo {
             println!("{}", message);
             true
         } else {
-            match self.file.as_mut().unwrap().write_str(message) {
+            match self.file.as_mut().unwrap().write(message.as_bytes()) {
                 Ok(_) => true,
                 Err(e) => {
                     println!("Cannot write:  {}", e);

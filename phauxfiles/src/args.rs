@@ -1,4 +1,4 @@
-use getopts::{optopt,optflag,getopts,OptGroup,usage};
+use getopts::Options;
 
 pub struct Arguments {
     pub program_name: String,
@@ -8,20 +8,19 @@ pub struct Arguments {
     pub exit: bool,
 }
 
-fn print_usage(program: &str, opts: &[OptGroup]) {
+fn print_usage(program: &str, opts: Options) {
     let brief = format!("Usage: {} [options]", program);
-    print!("{}", usage(brief.as_slice(), opts));
+    print!("{}", opts.usage(brief.as_slice()));
 }
 
 pub fn parse_args(arguments: Vec<String>) -> Arguments {
-    let opts = &[
-        optopt("n", "number-of-entries", "set output file name", "COUNT"),
-        optopt("o", "output-file", "set output file name", "NAME"),
-        optopt("s", "server-port", "run a web server", "SERVE"),
-        optflag("h", "help", "print this help menu")
-    ];
+    let mut opts = Options::new();
+    opts.optopt("n", "number-of-entries", "set output file name", "COUNT");
+    opts.optopt("o", "output-file", "set output file name", "NAME");
+    opts.optopt("s", "server-port", "run a web server", "SERVE");
+    opts.optflag("h", "help", "print this help menu");
 
-    let matches = match getopts(arguments.tail(), opts) {
+    let matches = match opts.parse(arguments.tail()) {
         Ok(m) => { m }
         Err(f) => { panic!(f.to_string()) }
     };
@@ -39,14 +38,20 @@ pub fn parse_args(arguments: Vec<String>) -> Arguments {
     }
 
     args.entries = match matches.opt_str("n") {
-        Some(x) => x.as_slice().parse(),
+        Some(s) => match s.as_slice().parse() {
+            Ok(x) => Some(x),
+            Err(_) => None,
+        },
         None => None,
     };
 
     args.filename = matches.opt_str("o");
 
     args.port = match matches.opt_str("s") {
-        Some(x) => x.as_slice().parse(),
+        Some(s) => match s.as_slice().parse() {
+            Ok(x) => Some(x),
+            Err(_) => None,
+        },
         None => None,
     };
 

@@ -1,15 +1,15 @@
 extern crate getopts;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate hyper;
-use getopts::{optopt,optflag,getopts,OptGroup,usage};
 use hyper::{Client, Get};
-use hyper::header::common::ContentLength;
+use hyper::header::ContentLength;
 use hyper::server::{Server, Request, Response};
 use hyper::uri::RequestUri::AbsolutePath;
 use rustc_serialize::json;
 use std::collections::HashMap;
-use std::io::File;
-use std::io::net::ip::Ipv4Addr;
+use std::fs::File;
+use std::io::{Read,Write};
+use std::net::IpAddr;
 use std::os;
 use fauxperson::{FauxPerson,FaceCollection};
 use validate::validator;
@@ -61,8 +61,9 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
         Ok(f) => f,
         Err(_) => { return "".to_string(); },
     };
-    let mut html = match file.read_to_string() {
-        Ok(s) => s,
+    let mut html = String::new();
+    match file.read_to_string(&mut html) {
+        Ok(_) => 1,
         Err(_) => { return "".to_string(); },
     };
     for who in people.iter() {
@@ -80,33 +81,46 @@ fn serve_file(mut res: Response, name: &str) {
         Ok(f) => f,
         Err(_) => { return; },
     };
-    let css = match file.read_to_string() {
-        Ok(s) => s,
+    let mut css = String::new();
+    match file.read_to_string(&mut css) {
+        Ok(_) => 1,
         Err(_) => { return; },
     };
     let out = css.as_bytes();
     res.headers_mut().set(ContentLength(out.len() as u64));
-    let mut res = res.start();
-    res.write(out).unwrap();
-    res.unwrap().end().unwrap();
+    match res.start() {
+        Ok(mut r) => {
+            r.write(out).unwrap();
+            r.end().unwrap();
+        },
+        Err(_) => (),
+    };
 }
 
 fn return_page(req: Request, mut res: Response) {
     match req.uri {
         AbsolutePath(ref p) => {
             let url = absurl::AbsUrl::new(p);
-            let count = url.get("count".to_string(), Some("6".to_string())).unwrap();
+            let count_str = url.get("count".to_string(), Some("6".to_string())).unwrap();
+            let count: Option<i16> = match count_str.parse() {
+                Ok(x) => Some(x),
+                Err(_) => None,
+            };
             let nation = validator::country(url.get("where".to_string(), None));
             let sex = validator::gender(url.get("sex".to_string(), None));
 
             match (&req.method, url.path.as_slice()) {
                 (&Get, "/") => {
-                    let html = generate_page_text(count.parse(), nation, sex);
+                    let html = generate_page_text(count, nation, sex);
                     let out = html.as_bytes();
                     res.headers_mut().set(ContentLength(out.len() as u64));
-                    let mut res = res.start();
-                    res.write(out).unwrap();
-                    res.unwrap().end().unwrap();
+                    match res.start() {
+                        Ok(mut r) => {
+                            r.write(out).unwrap();
+                            r.end().unwrap();
+                        },
+                        Err(_) => (),
+                    };
                     return;
                 },
                 (&Get, "/favicon.ico") => {
@@ -132,9 +146,7 @@ fn return_page(req: Request, mut res: Response) {
 }
 
 fn serve_http(port: u16, count: Option<i16>) {
-    let server = Server::http(Ipv4Addr(127, 0, 0, 1), port);
-    let mut listening = server.listen(return_page).unwrap();
-    listening.await();
+    Server::http(return_page).listen(IpAddr::new_v4(127, 0, 0, 1), port).unwrap();
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
@@ -145,5 +157,10 @@ fn http_get(host: &str, port: i32, path: &str) -> String {
         Ok(x) => x,
         Err(e) => panic!(e),
     };
-    response.read_to_string().unwrap()
+    let mut resp = String::new();
+    match response.read_to_string(&mut resp) {
+      Ok(_) => 1,
+      Err(_) => { return "".to_string(); },
+    };
+    resp.clone()
 }
