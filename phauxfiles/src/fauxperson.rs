@@ -1,6 +1,4 @@
-extern crate "rustc-serialize" as rustc_serialize;
 use std::fmt;
-use std::string;
 
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct FauxPerson {

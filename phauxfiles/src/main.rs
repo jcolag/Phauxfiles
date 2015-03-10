@@ -6,7 +6,6 @@ use hyper::header::ContentLength;
 use hyper::server::{Server, Request, Response};
 use hyper::uri::RequestUri::AbsolutePath;
 use rustc_serialize::json;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read,Write};
 use std::net::IpAddr;
