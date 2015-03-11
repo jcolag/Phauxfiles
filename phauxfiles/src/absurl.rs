@@ -6,18 +6,19 @@ pub struct AbsUrl {
     args: HashMap<String, String>,
 }
 
+#[allow(dead_code)]
 impl AbsUrl {
     pub fn new(path: &String) -> AbsUrl {
         let mut args: HashMap<String, String> = HashMap::new();
-        let mut path_parts = path.split_str("?");
+        let mut path_parts = path.split("?");
         let out_path = path_parts.next().unwrap().to_string();
         let query = match path_parts.next() {
             Some(s) => s.to_string(),
             None => "".to_string(),
         };
 
-        for var in query.split_str("&") {
-            let mut var_parts = var.split_str("=");
+        for var in query.split("&") {
+            let mut var_parts = var.split("=");
             let key = match var_parts.next() {
                 Some(s) => s.to_string(),
                 None => continue,
