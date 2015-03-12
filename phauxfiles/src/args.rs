@@ -1,4 +1,5 @@
 use getopts::Options;
+use std::env::Args;
 
 pub struct Arguments {
     pub program_name: String,
@@ -13,20 +14,20 @@ fn print_usage(program: &str, opts: Options) {
     print!("{}", opts.usage(brief.as_slice()));
 }
 
-pub fn parse_args(arguments: Vec<String>) -> Arguments {
+pub fn parse_args(arguments: Args) -> Arguments {
     let mut opts = Options::new();
     opts.optopt("n", "number-of-entries", "set output file name", "COUNT");
     opts.optopt("o", "output-file", "set output file name", "NAME");
     opts.optopt("s", "server-port", "run a web server", "SERVE");
     opts.optflag("h", "help", "print this help menu");
 
-    let matches = match opts.parse(arguments.tail()) {
+    let matches = match opts.parse(arguments) {
         Ok(m) => { m }
         Err(f) => { panic!(f.to_string()) }
     };
 
     let mut args = Arguments {
-        program_name: arguments[0].clone(),
+        program_name: "".to_string(),
         entries: None,
         filename: None,
         port: None,

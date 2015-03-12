@@ -9,7 +9,6 @@ use rustc_serialize::json;
 use std::fs::File;
 use std::io::{Read,Write};
 use std::net::IpAddr;
-use std::os;
 use fauxperson::{FauxPerson,FaceCollection};
 use validate::validator;
 
@@ -20,7 +19,7 @@ mod validate;
 mod args;
 
 fn main() {
-    let args: Vec<String> = os::args();
+    let args: std::env::Args = std::env::args();
     let opts = args::parse_args(args);
 
     if opts.exit {
