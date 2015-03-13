@@ -68,9 +68,11 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
         let div = format!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
-        html = format!("{}{}\n", html, div);
+        html.push_str(div.as_slice());
+        html.push_str("\n");
     }
-    format!("{}</body></html>", html)
+    html.push_str("</body></html>");
+    html
 }
 
 fn serve_file(mut res: Response, name: &str) {
