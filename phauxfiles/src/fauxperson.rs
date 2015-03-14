@@ -40,7 +40,7 @@ pub struct ImageUrl {
 
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct FaceCollection {
-    username: String,
+    pub username: String,
     image_urls: ImageUrl,
 }
 

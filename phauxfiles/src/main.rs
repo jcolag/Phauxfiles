@@ -67,7 +67,7 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
     for who in people.iter() {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
         let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
-        let div = format!("<div class='profile'>\n{}\n{}\n</div>\n", urls.to_string(), who.to_string());
+        let div = format!("<div class='profile'>\n<a href='http://uifaces.com/{}'>{}</a>\n{}\n</div>\n", urls.username, urls.to_string(), who.to_string());
         html.push_str(div.as_slice());
         html.push_str("\n");
     }
