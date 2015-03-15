@@ -7,6 +7,8 @@ In reality, _Phauxfiles_ isn't much more than an excuse to experiment with [Rust
 
 The program itself is fairly straightforward:  Grab a bunch of names from UI Names and, for each name, get a URL to a random avatar from User Inter Faces.  Wrap that in style-ready HTML and print it.
 
+Because the people submitting their avatars for reuse should get some recognition, the avatar is now clickable, taking you to their page on User Inter Faces, which allows you to click through to their Twitter profiles.
+
 Build
 -----
 
