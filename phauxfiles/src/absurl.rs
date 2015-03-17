@@ -39,7 +39,7 @@ impl AbsUrl {
     }
 
     pub fn get(&self, key: String, default: Option<String>) -> Option<String> {
-        let keyslice = key.as_slice();
+        let keyslice = &*key;
         if self.args.contains_key(keyslice) {
             Some(self.args.get(keyslice).unwrap().to_string())
         } else {

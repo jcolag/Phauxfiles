@@ -38,7 +38,7 @@ fn generate_page(outfile_name: Option<String>, count: Option<i16>) {
         None => "".to_string(),
     });
     let response = generate_page_text(count, None, None);
-    out.write(response.as_slice());
+    out.write(&*response);
 }
 
 fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<String>) -> String {
@@ -52,8 +52,8 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
         Some(s) => format!("&gender={}", s),
         None => "".to_string(),
     });
-    let names = http_get("api.uinames.com", 80, path.as_slice());
-    let people: Vec<FauxPerson> = json::decode(names.as_slice()).unwrap();
+    let names = http_get("api.uinames.com", 80, &*path);
+    let people: Vec<FauxPerson> = json::decode(&*names).unwrap();
     let path = Path::new("template.html");
     let mut file = match File::open(&path) {
         Ok(f) => f,
@@ -66,9 +66,9 @@ fn generate_page_text(count: Option<i16>, country: Option<String>, sex: Option<S
     };
     for who in people.iter() {
         let faces = http_get("uifaces.com", 80, "/api/v1/random");
-        let urls: FaceCollection = json::decode(faces.as_slice()).unwrap();
+        let urls: FaceCollection = json::decode(&*faces).unwrap();
         let div = format!("<div class='profile'>\n<a href='http://uifaces.com/{}'>{}</a>\n{}\n</div>\n", urls.username, urls.to_string(), who.to_string());
-        html.push_str(div.as_slice());
+        html.push_str(&*div);
         html.push_str("\n");
     }
     html.push_str("</body></html>");
@@ -109,7 +109,7 @@ fn return_page(req: Request, mut res: Response) {
             let nation = validator::country(url.get("where".to_string(), None));
             let sex = validator::gender(url.get("sex".to_string(), None));
 
-            match (&req.method, url.path.as_slice()) {
+            match (&req.method, &*url.path) {
                 (&Get, "/") => {
                     let html = generate_page_text(count, nation, sex);
                     let out = html.as_bytes();
@@ -152,7 +152,7 @@ fn serve_http(port: u16, count: Option<i16>) {
 fn http_get(host: &str, port: i32, path: &str) -> String {
     let url = format!("http://{}:{}{}", host, port, path);
     let mut client = Client::new();
-    let res = client.get(url.as_slice()).send();
+    let res = client.get(&*url).send();
     let mut response = match res {
         Ok(x) => x,
         Err(e) => panic!(e),

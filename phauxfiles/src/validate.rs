@@ -6,7 +6,7 @@ pub mod validator {
     pub fn gender(sex: Option<String>) -> Option<String> {
         match sex {
             None => None,
-            Some(s) => match s.as_slice() {
+            Some(s) => match &*s {
                 "m" | "M" | "male" => slice_to_stropt("male"),
                 "f" | "F" | "female" => slice_to_stropt("female"),
                 _ => None,
@@ -17,7 +17,7 @@ pub mod validator {
     pub fn country(country: Option<String>) -> Option<String> {
         match country {
             None => None,
-            Some(c) => match c.as_slice() {
+            Some(c) => match &*c {
                 "al" => slice_to_stropt("Albania"),
                 "ar" => slice_to_stropt("Argentina"),
                 "au" => slice_to_stropt("Australia"),

@@ -10,7 +10,7 @@ pub struct FauxPerson {
 
 impl fmt::Display for FauxPerson {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let (ref name, ref surname) = match self.country.as_slice() {
+        let (ref name, ref surname) = match &*self.country {
             // Surnames still come first for Chinese names, presumably
             "China" => (self.surname.clone(), self.name.clone()),
             _ => (self.name.clone(), self.surname.clone()),
