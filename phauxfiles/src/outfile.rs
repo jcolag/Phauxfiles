@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::path::Path;
 use std::io::Write;
 
 pub struct FileIo {
@@ -10,7 +11,7 @@ impl FileIo {
     pub fn new(name: String) -> FileIo {
         FileIo {
             filename: name.clone(),
-            file: match File::create(&Path::new(name.clone())) {
+            file: match File::create(&Path::new(&*name)) {
                 Ok(f) => Some(f),
                 Err(e) => if name == "" {
                     None

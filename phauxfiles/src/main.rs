@@ -7,6 +7,7 @@ use hyper::server::{Server, Request, Response};
 use hyper::uri::RequestUri::AbsolutePath;
 use rustc_serialize::json;
 use std::fs::File;
+use std::path::Path;
 use std::io::{Read,Write};
 use std::net::IpAddr;
 use fauxperson::{FauxPerson,FaceCollection};
