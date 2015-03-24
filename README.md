@@ -120,3 +120,15 @@ In the spirit of full disclosure...
 
  - More extensive profile information would be nice, though there don't seem to be any handy APIs to play with.  I may integrate quotes and cat pictures at some point, but that still doesn't flesh out the profile itself.
 
+ - APIs that might be of interest (which I'm partly documenting here just to have them documented _somewhere_ I can access more than because I plan to do much more work on these fake profiles) would include...
+
+   - [Random Word](http://randomword.setgetgo.com/) might be useful for generating a lot of simple things.
+
+   - [It's This for That](http://itsthisforthat.com/api.php) can explain companies, if not name them.
+
+   - [The Cat API](http://thecatapi.com/docs.html), because even though it's not my thing, the Internet does largely run on random cat pictures.  Note that this is _not_ the only such API.
+
+   - [Heavy Metal Name Generator](http://metallizer.dk/content/xml-http-api) for favorite albums, I assume.  Sure, everybody loves heavy metal.  Why not?
+
+   - Quotes from [I <3 Quotes](http://www.iheartquotes.com/api) and [They Said So](https://theysaidso.com/api), surely among others.
+

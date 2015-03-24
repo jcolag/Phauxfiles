@@ -18,18 +18,7 @@ impl fmt::Display for FauxPerson {
         write!(f, "<h2>{} {}</h2>\n{} from <strong>{}</strong>", name, surname, self.gender, self.country)
     }
 }
-/*
-impl string::ToString for FauxPerson {
-    fn to_string(&self) -> String {
-        let (ref name, ref surname) = match self.country.as_slice() {
-            // Surnames still come first for Chinese names, presumably
-            "China" => (self.surname.clone(), self.name.clone()),
-            _ => (self.name.clone(), self.surname.clone()),
-        };
-        format!("<h2>{} {}</h2>\n{} from <strong>{}</strong>", name, surname, self.gender, self.country)
-     }
-}
-*/
+
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct ImageUrl {
     epic: String,
@@ -49,10 +38,4 @@ impl fmt::Display for FaceCollection {
         write!(f, "<img src='{}'>", self.image_urls.epic)
     }
 }
-/*
-impl string::ToString for FaceCollection {
-    fn to_string(&self) -> String {
-        format!("<img src='{}'>", self.image_urls.epic)
-    }
-}
-*/
+
