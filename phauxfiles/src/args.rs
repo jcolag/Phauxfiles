@@ -11,7 +11,7 @@ pub struct Arguments {
 
 fn print_usage(program: &str, opts: Options) {
     let brief = format!("Usage: {} [options]", program);
-    print!("{}", opts.usage(brief.as_slice()));
+    print!("{}", opts.usage(&*brief));
 }
 
 pub fn parse_args(arguments: Args) -> Arguments {

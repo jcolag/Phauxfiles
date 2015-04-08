@@ -1,5 +1,12 @@
+/*
+#![feature(env)]
+#![feature(fs)]
+#![feature(net)]
+#![feature(path)]
+#![feature(io)]
+*/
 extern crate getopts;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate rustc_serialize;
 extern crate hyper;
 use hyper::{Client, Get};
 use hyper::header::ContentLength;
@@ -9,7 +16,7 @@ use rustc_serialize::json;
 use std::fs::File;
 use std::path::Path;
 use std::io::{Read,Write};
-use std::net::IpAddr;
+//use std::net::IpAddr;
 use fauxperson::{FauxPerson,FaceCollection};
 use validate::validator;
 
@@ -147,7 +154,8 @@ fn return_page(req: Request, mut res: Response) {
 }
 
 fn serve_http(port: u16, count: Option<i16>) {
-    Server::http(return_page).listen(IpAddr::new_v4(127, 0, 0, 1), port).unwrap();
+    let url = format!("127.0.0.1:{}", port);
+    Server::http(return_page).listen(&*url).unwrap();
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
