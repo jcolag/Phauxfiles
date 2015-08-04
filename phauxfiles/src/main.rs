@@ -155,7 +155,7 @@ fn return_page(req: Request, mut res: Response) {
 
 fn serve_http(port: u16, count: Option<i16>) {
     let url = format!("127.0.0.1:{}", port);
-    Server::http(return_page).listen(&*url).unwrap();
+    Server::http(&*url).unwrap().handle(return_page).unwrap();
 }
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
