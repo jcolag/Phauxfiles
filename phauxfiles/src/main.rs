@@ -160,7 +160,7 @@ fn serve_http(port: u16, count: Option<i16>) {
 
 fn http_get(host: &str, port: i32, path: &str) -> String {
     let url = format!("http://{}:{}{}", host, port, path);
-    let mut client = Client::new();
+    let client = Client::new();
     let res = client.get(&*url).send();
     let mut response = match res {
         Ok(x) => x,
