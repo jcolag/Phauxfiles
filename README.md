@@ -12,7 +12,7 @@ Because the people submitting their avatars for reuse should get some recognitio
 Build
 -----
 
-__Note__:  For reference, between the Rust v1.0 beta and the official v1.0 release, no changes needed to be made for the code.  However, on Linux, I needed to (re-)install `libc-dev` and `libssl-dev`.  If `cargo` can't build the required libraries, I would start there.
+__Note__:  For reference, between the Rust v1.0 beta and the official v1.0 release, no changes needed to be made for the code.  However, on Linux, I needed to (re-)install `libc-dev` and `libssl-dev`; `libssl-dev` needed to be installed yet again for Rust v1.1, as well.  If `cargo` can't build the required libraries, I would start there.
 
 Ready?
 
